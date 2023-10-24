@@ -6,6 +6,12 @@ export const GET = async (req) => {
     await connectToDb();
     const cards = await Card.find({}).populate("creator");
 
+    for (const card of cards) {
+      const decoded = card.img_data.replace(/data:.*base64,/, "");
+      const imageResp = new Buffer(decoded, "base64");
+      card.decodedImg = imageResp;
+    }
+
     return new Response(JSON.stringify(cards), {
       status: 200,
     });

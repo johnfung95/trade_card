@@ -14,6 +14,14 @@ const CardSchema = new Schema({
     type: String,
     required: [true, "Description is required!"],
   },
+  filename: {
+    type: String,
+  },
+  img_data: {
+    type: String,
+    data: Buffer,
+    required: [true, "Image is required!"],
+  },
 });
 
 // check if user already exists in the models, else create one

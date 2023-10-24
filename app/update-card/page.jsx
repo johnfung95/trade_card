@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Form from "../../components/Form";
+import { toBase64 } from "@utils/utils";
 
 const EditCard = () => {
   const searchParams = useSearchParams();
@@ -11,13 +12,21 @@ const EditCard = () => {
   const [card, setCard] = useState({
     title: "",
     description: "",
+    filename: "",
+    img_data: "",
   });
 
   useEffect(() => {
     const getCardDetails = async () => {
       const res = await fetch(`/api/card/${cardId}`);
       const data = await res.json();
-      setCard({ title: data.title, description: data.description });
+      console.log(data);
+      setCard({
+        title: data.title,
+        description: data.description,
+        filename: data.filename,
+        img_data: data.img_data,
+      });
     };
 
     if (cardId) {
@@ -31,12 +40,16 @@ const EditCard = () => {
 
     if (!cardId) return alert("Card ID not found!");
 
+    const base64 = await toBase64(card.img_data);
+
     try {
       const res = await fetch(`/api/card/${cardId}`, {
         method: "PATCH",
         body: JSON.stringify({
           title: card.title,
           description: card.description,
+          filename: card.filename,
+          img_data: base64,
         }),
       });
 

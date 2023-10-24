@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { usePathname } from "next/navigation";
 
@@ -8,6 +8,7 @@ const TradeCard = ({ card, handleTagClick, handleEdit, handleDelete }) => {
   const { data: session } = useSession();
   const pathName = usePathname();
   const [copied, setCopied] = useState("");
+  const [previewImage, setPreviewImage] = useState(null);
 
   const handleCopy = () => {
     setCopied(card.title);
@@ -15,6 +16,11 @@ const TradeCard = ({ card, handleTagClick, handleEdit, handleDelete }) => {
 
     setTimeout(() => setCopied(""), 3000);
   };
+
+  useEffect(() => {
+    console.log(card, previewImage);
+    setPreviewImage(new Buffer(card.img_data));
+  }, [card]);
 
   return (
     <div className="trade_card">
@@ -56,7 +62,7 @@ const TradeCard = ({ card, handleTagClick, handleEdit, handleDelete }) => {
       >
         #{card.description}
       </p>
-
+      {previewImage && <img src={previewImage} />}
       {session?.user.id === card.creator._id && pathName === "/profile" && (
         <div className="mt-5 flex-center gap-4 border-t border-gray-100 pt-3">
           <p

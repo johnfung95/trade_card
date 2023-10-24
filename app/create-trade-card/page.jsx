@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Form from "../../components/Form";
+import { toBase64 } from "@utils/utils";
 
 const CreateCard = () => {
   const { data: session } = useSession();
@@ -11,11 +12,15 @@ const CreateCard = () => {
   const [card, setCard] = useState({
     title: "",
     description: "",
+    filename: "",
+    img_data: "",
   });
 
   const createCard = async (e) => {
     e.preventDefault();
     setSubmitting(true);
+
+    const base64 = await toBase64(card.img_data);
 
     try {
       const res = await fetch("/api/card/new", {
@@ -24,6 +29,8 @@ const CreateCard = () => {
           title: card.title,
           userId: session?.user.id,
           description: card.description,
+          filename: card.filename,
+          img_data: base64,
         }),
       });
 

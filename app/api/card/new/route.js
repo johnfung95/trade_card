@@ -2,7 +2,7 @@ import { connectToDb } from "../../../../utils/database";
 import Card from "../../../../models/cards";
 
 export const POST = async (req) => {
-  const { userId, title, description } = await req.json();
+  const { userId, title, description, filename, img_data } = await req.json();
 
   try {
     await connectToDb();
@@ -10,6 +10,8 @@ export const POST = async (req) => {
       creator: userId,
       title: title,
       description: description,
+      filename: filename,
+      img_data: img_data,
     });
 
     await newCard.save();

@@ -20,7 +20,7 @@ export const GET = async (req, { params }) => {
 };
 
 export const PATCH = async (req, { params }) => {
-  const { title, description } = await req.json();
+  const { title, description, filename, img_data } = await req.json();
   try {
     await connectToDb();
     const existingCard = await Card.findById(params.id);
@@ -29,6 +29,8 @@ export const PATCH = async (req, { params }) => {
 
     existingCard.title = title;
     existingCard.description = description;
+    existingCard.filename = filename;
+    existingCard.img_data = img_data;
 
     await existingCard.save();
     return new Response(JSON.stringify(existingCard), { status: 200 });
