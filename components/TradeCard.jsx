@@ -19,7 +19,7 @@ const TradeCard = ({ card, handleTagClick, handleEdit, handleDelete }) => {
   return (
     <div className="trade_card">
       <div className="flex justify-between items-start gap-5">
-        {/* <div className="flex-1 flex justify-start items-center gap-3 cursor-pointer">
+        <div className="flex-1 flex justify-start items-center gap-3 cursor-pointer">
           <Image
             src={card.creator.image}
             alt="user_image"
@@ -35,7 +35,7 @@ const TradeCard = ({ card, handleTagClick, handleEdit, handleDelete }) => {
               {card.creator.email}
             </p>
           </div>
-        </div> */}
+        </div>
         <div className="copy_btn" onClick={handleCopy}>
           <Image
             src={
