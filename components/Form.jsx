@@ -8,7 +8,7 @@ const Form = ({ type, card, setCard, handleSubmit }) => {
 
   useEffect(() => {
     try {
-      setPreviewImage(new Buffer(card.img_data));
+      setPreviewImage(new Buffer.from(card.img_data));
     } catch (error) {
       return;
     }

@@ -8,7 +8,7 @@ export const GET = async (req) => {
 
     for (const card of cards) {
       const decoded = card.img_data.replace(/data:.*base64,/, "");
-      const imageResp = new Buffer(decoded, "base64");
+      const imageResp = new Buffer.from(decoded, "base64");
       card.decodedImg = imageResp;
     }
 

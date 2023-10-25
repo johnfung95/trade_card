@@ -18,7 +18,7 @@ const TradeCard = ({ card, handleEdit, handleDelete }) => {
   };
 
   useEffect(() => {
-    setPreviewImage(new Buffer(card.img_data));
+    setPreviewImage(new Buffer.from(card.img_data));
   }, [card.img_data]);
 
   return (
