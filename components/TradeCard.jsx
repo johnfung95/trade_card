@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { usePathname } from "next/navigation";
 
-const TradeCard = ({ card, handleTagClick, handleEdit, handleDelete }) => {
+const TradeCard = ({ card, handleEdit, handleDelete }) => {
   const { data: session } = useSession();
   const pathName = usePathname();
   const [copied, setCopied] = useState("");
@@ -18,9 +18,8 @@ const TradeCard = ({ card, handleTagClick, handleEdit, handleDelete }) => {
   };
 
   useEffect(() => {
-    console.log(card, previewImage);
     setPreviewImage(new Buffer(card.img_data));
-  }, [card]);
+  }, [card.img_data]);
 
   return (
     <div className="trade_card">
@@ -55,14 +54,18 @@ const TradeCard = ({ card, handleTagClick, handleEdit, handleDelete }) => {
           />
         </div>
       </div>
-      <p className="my-4 font-satoshi text-sm text-gray-700">{card.title}</p>
-      <p
-        className="font-inter text-sm blue_gradient cursor-pointer"
-        onClick={handleTagClick && handleTagClick(card.description)}
-      >
-        #{card.description}
-      </p>
-      {previewImage && <img src={previewImage} />}
+      <div>
+        <p className="my-4 font-satoshi text-lg font-bold">{card.title}</p>
+        {previewImage && (
+          <img
+            className="object-scale-down h-40 w-fit m-auto"
+            src={previewImage}
+          />
+        )}
+        <p className="font-inter text-sm my-4 italic cursor-pointer">
+          {card.description}
+        </p>
+      </div>
       {session?.user.id === card.creator._id && pathName === "/profile" && (
         <div className="mt-5 flex-center gap-4 border-t border-gray-100 pt-3">
           <p

@@ -8,7 +8,6 @@ import { toBase64 } from "@utils/utils";
 const CreateCard = () => {
   const { data: session } = useSession();
   const router = useRouter();
-  const [submitting, setSubmitting] = useState(false);
   const [card, setCard] = useState({
     title: "",
     description: "",
@@ -18,7 +17,6 @@ const CreateCard = () => {
 
   const createCard = async (e) => {
     e.preventDefault();
-    setSubmitting(true);
 
     const base64 = await toBase64(card.img_data);
 
@@ -39,8 +37,6 @@ const CreateCard = () => {
       }
     } catch (error) {
       console.log(error);
-    } finally {
-      setSubmitting(false);
     }
   };
 
@@ -49,7 +45,6 @@ const CreateCard = () => {
       type="Create"
       card={card}
       setCard={setCard}
-      submitting={submitting}
       handleSubmit={createCard}
     />
   );

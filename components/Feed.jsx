@@ -1,48 +1,65 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import TradeCard from "./TradeCard";
 
-const TradeCardList = ({ data, handleTagClick }) => {
+const TradeCardList = ({ data }) => {
   return (
     <div className="mt-16 card_layout">
       {data.map((card) => (
-        <TradeCard key={card._id} card={card} handleTagClick={handleTagClick} />
+        <TradeCard key={card._id} card={card} />
       ))}
     </div>
   );
 };
 
 const Feed = () => {
+  let searchRef = useRef("");
   const [searchText, setSearchText] = useState("");
   const [cards, setCards] = useState([]);
-  const handleSearchChange = (e) => {
-    setSearchText(e.target.value);
+  const [filterCards, setFilterCards] = useState([]);
+
+  const searchChangeHandler = (e) => {
+    e.preventDefault();
+    searchRef.current = e.target.value;
   };
+
+  useEffect(() => {
+    const delay = setTimeout(() => {
+      setSearchText(searchRef.current);
+    }, 3000);
+
+    return () => clearTimeout(delay);
+  });
+
+  useEffect(() => {
+    const data = cards.filter((item) => item.title === searchText);
+    if (data.length <= 0) {
+      setFilterCards(null);
+    } else {
+      setFilterCards(data);
+    }
+  }, [searchText]);
 
   useEffect(() => {
     const fetchCards = async () => {
       const res = await fetch("/api/card");
       const data = await res.json();
-
       setCards(data);
     };
-
     fetchCards();
   }, []);
 
   return (
     <section className="feed">
-      <form className="relative w-full flex-center">
-        <input
-          type="text"
-          placeholder="Search for a tag or a username"
-          value={searchText}
-          onChange={handleSearchChange}
-          required
-          className="search_input peer"
-        />
-      </form>
-      <TradeCardList data={cards} handleTagClick={() => {}} />
+      <input
+        type="text"
+        placeholder="Search for title"
+        ref={searchRef}
+        onChange={searchChangeHandler}
+        required
+        className="search_input peer"
+      />
+      <TradeCardList data={filterCards ? filterCards : cards} />
     </section>
   );
 };

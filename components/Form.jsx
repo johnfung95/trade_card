@@ -2,14 +2,15 @@
 import Link from "next/link";
 import React, { useState, useEffect } from "react";
 
-const Form = ({ type, card, setCard, submitting, handleSubmit }) => {
+const Form = ({ type, card, setCard, handleSubmit }) => {
   const [previewImage, setPreviewImage] = useState(null);
-  const [initLoading, setInitLoading] = useState(true);
+  const [formValid, setFormValid] = useState(false);
 
   useEffect(() => {
-    if (card.img_data != "" && initLoading) {
+    try {
       setPreviewImage(new Buffer(card.img_data));
-      setInitLoading(false);
+    } catch (error) {
+      return;
     }
   }, [card.img_data]);
 
@@ -40,20 +41,17 @@ const Form = ({ type, card, setCard, submitting, handleSubmit }) => {
         </label>
         <label>
           <span className="font-satoshi font-semibold text-base text-gray-700">
-            Description {` `}
-            <span className="font-normal">
-              (#product, #webdevelopment, #idea)
-            </span>
+            Description
           </span>
           <textarea
             onChange={(e) => setCard({ ...card, description: e.target.value })}
             value={card.description}
-            placeholder="#description"
+            placeholder="Write a brief description of your card here ..."
             required
             className="form_textarea"
           ></textarea>
         </label>
-        <div>
+        <div className="flex flex-col mb-4">
           <label>Upload Image</label>
           <input
             onChange={(e) => {
@@ -63,18 +61,31 @@ const Form = ({ type, card, setCard, submitting, handleSubmit }) => {
               } else {
                 num = 0;
               }
-              if (e.target.files?.[num]) {
-                const file = e.target.files[num];
-                const reader = new FileReader();
-                reader.onloadend = () => {
-                  setPreviewImage(reader.result);
-                };
-                reader.readAsDataURL(file);
+              if (e.target.files[num].size > 2097152) {
+                alert("File size should be less than 2 MB!");
+                setPreviewImage(null);
                 setCard({
-                  ...card,
-                  filename: e.target.files[num].name,
-                  img_data: e.target.files[num],
+                  title: card.title,
+                  description: card.description,
+                  filename: "",
+                  img_data: "",
                 });
+                setFormValid(false);
+              } else {
+                if (e.target.files?.[num]) {
+                  const file = e.target.files[num];
+                  const reader = new FileReader();
+                  reader.onloadend = () => {
+                    setPreviewImage(reader.result);
+                  };
+                  reader.readAsDataURL(file);
+                  setCard({
+                    ...card,
+                    filename: e.target.files[num].name,
+                    img_data: e.target.files[num],
+                  });
+                  setFormValid(true);
+                }
               }
             }}
             type="file"
@@ -82,7 +93,12 @@ const Form = ({ type, card, setCard, submitting, handleSubmit }) => {
             accept="image/*"
             required
           />
-          {previewImage && <img src={previewImage} />}
+          {previewImage && (
+            <img
+              className="m-auto object-scale-down h-40 w-fit"
+              src={previewImage}
+            />
+          )}
         </div>
         <div className="flex-end mx-3 mb-5 gap-4">
           <Link href="/" className="text-gray-500 text-sm">
@@ -90,10 +106,12 @@ const Form = ({ type, card, setCard, submitting, handleSubmit }) => {
           </Link>
           <button
             type="submit"
-            disabled={submitting}
-            className="px-5 py-1.5 text-sm bg-primary-orange rounded-full text-white"
+            disabled={!formValid}
+            className={`px-5 py-1.5 text-sm rounded-full text-white ${
+              formValid ? "bg-primary-orange" : "bg-zinc-300"
+            }`}
           >
-            {submitting ? `${type}...` : type}
+            Create
           </button>
         </div>
       </form>

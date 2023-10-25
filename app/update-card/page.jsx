@@ -8,7 +8,6 @@ const EditCard = () => {
   const searchParams = useSearchParams();
   const cardId = searchParams.get("id");
   const router = useRouter();
-  const [submitting, setSubmitting] = useState(false);
   const [card, setCard] = useState({
     title: "",
     description: "",
@@ -20,7 +19,6 @@ const EditCard = () => {
     const getCardDetails = async () => {
       const res = await fetch(`/api/card/${cardId}`);
       const data = await res.json();
-      console.log(data);
       setCard({
         title: data.title,
         description: data.description,
@@ -36,7 +34,6 @@ const EditCard = () => {
 
   const updateCard = async (e) => {
     e.preventDefault();
-    setSubmitting(true);
 
     if (!cardId) return alert("Card ID not found!");
 
@@ -58,19 +55,11 @@ const EditCard = () => {
       }
     } catch (error) {
       console.log(error);
-    } finally {
-      setSubmitting(false);
     }
   };
 
   return (
-    <Form
-      type="Edit"
-      card={card}
-      setCard={setCard}
-      submitting={submitting}
-      handleSubmit={updateCard}
-    />
+    <Form type="Edit" card={card} setCard={setCard} handleSubmit={updateCard} />
   );
 };
 
