@@ -1,52 +1,58 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
 import TradeCard from "./TradeCard";
 
 const TradeCardList = ({ data }) => {
   return (
     <div className="mt-16 card_layout">
-      {data.map((card) => (
-        <TradeCard key={card._id} card={card} />
-      ))}
+      {data && data.map((card) => <TradeCard key={card._id} card={card} />)}
     </div>
   );
 };
 
 const Feed = () => {
-  let searchRef = useRef("");
   const [searchText, setSearchText] = useState("");
   const [cards, setCards] = useState([]);
-  const [filterCards, setFilterCards] = useState([]);
 
-  const searchChangeHandler = (e) => {
-    e.preventDefault();
-    searchRef.current = e.target.value;
-  };
+  const fetchCards = useCallback(async () => {
+    const res = await fetch("/api/card");
+    const data = await res.json();
+    return data;
+  }, []);
 
   useEffect(() => {
-    const delay = setTimeout(() => {
-      setSearchText(searchRef.current);
-    }, 3000);
+    const filtering = async () => {
+      const results = await fetchCards();
+      if (results) {
+        const data = results.filter((item) => item.title == searchText.trim());
+        if (data.length >= 1) {
+          setCards(data);
+        } else {
+          setCards(null);
+        }
+      }
+    };
+
+    const delay = setTimeout(async () => {
+      if (searchText.trim() != "" && cards) {
+        filtering();
+      } else if (searchText.trim() != "" && !cards) {
+        filtering();
+      } else {
+        const results = await fetchCards();
+        setCards(results);
+      }
+    }, 2000);
 
     return () => clearTimeout(delay);
-  });
-
-  useEffect(() => {
-    const data = cards.filter((item) => item.title === searchText);
-    if (data.length <= 0) {
-      setFilterCards(null);
-    } else {
-      setFilterCards(data);
-    }
   }, [searchText]);
 
   useEffect(() => {
-    const fetchCards = async () => {
-      const res = await fetch("/api/card");
-      const data = await res.json();
-      setCards(data);
+    const getCards = async () => {
+      const results = await fetchCards();
+      setCards(results);
     };
-    fetchCards();
+    getCards();
   }, []);
 
   return (
@@ -54,12 +60,14 @@ const Feed = () => {
       <input
         type="text"
         placeholder="Search for title"
-        ref={searchRef}
-        onChange={searchChangeHandler}
+        onChange={(e) => {
+          setSearchText(e.target.value);
+        }}
+        value={searchText}
         required
         className="search_input peer"
       />
-      <TradeCardList data={filterCards ? filterCards : cards} />
+      <TradeCardList data={cards} />
     </section>
   );
 };
